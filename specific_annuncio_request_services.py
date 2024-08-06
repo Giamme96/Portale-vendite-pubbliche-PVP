@@ -15,16 +15,16 @@ def request_specific_annuncio_from_pvp(id_annuncio : int) -> requests.Request:
 
     return annuncio_request_response
 
-def request_esperimento_for_annuncio(idLotto_annuncio : int) -> requests.Request:
-    '''
-    Looking for esperimenti d'asta for idLotto in annuncio
+# def request_esperimento_for_annuncio(idLotto_annuncio : int) -> requests.Request:
+#     '''
+#     Looking for esperimenti d'asta for idLotto in annuncio
 
-    '''
-    esperimento_request_response = session.get(f"https://pvp.giustizia.it/ve-3f723b85-986a1b71/ve-ms/vendite/lotti/{idLotto_annuncio}/vendite-precedenti")
+#     '''
+#     esperimento_request_response = session.get(f"https://pvp.giustizia.it/ve-3f723b85-986a1b71/ve-ms/vendite/lotti/{idLotto_annuncio}/vendite-precedenti")
 
-    return esperimento_request_response
+#     return esperimento_request_response
 
-def parse_info_from_annuncio(annuncio_response : requests.Request) -> int:
+def parse_info_from_annuncio(annuncio_response : requests.Request) -> None:
 
     '''
     Parse request response and normalize json to extract all infos about annuncio
@@ -38,98 +38,57 @@ def parse_info_from_annuncio(annuncio_response : requests.Request) -> int:
     source_key = df_annuncio["idVendita"].item()
 
     if "allegati" in df_annuncio.columns:
-        df_allegati = json_normalize(df_annuncio["allegati"].explode())
-        df_allegati["source_id"] = source_key
-        dfs_annunci_allegati_list.append(df_allegati)
+        if df_annuncio["allegati"].notna().any():
+            df_allegati = json_normalize(df_annuncio["allegati"].explode())
+            df_allegati["source_id"] = source_key
+            dfs_annunci_allegati_list.append(df_allegati)
     
     if "eventiSignificativiEstesi" in df_annuncio.columns:
-        df_eventi_significativi = json_normalize(df_annuncio["eventiSignificativiEstesi"].explode())
-        df_eventi_significativi["source_id"] = source_key
-        dfs_annunci_eventi_significativi_list.append(df_eventi_significativi)
+        if df_annuncio["eventiSignificativiEstesi"].notna().any():
+            df_eventi_significativi = json_normalize(df_annuncio["eventiSignificativiEstesi"].explode())
+            df_eventi_significativi["source_id"] = source_key
+            dfs_annunci_eventi_significativi_list.append(df_eventi_significativi)
 
     if "siti" in df_annuncio.columns:
-        df_pubblicità = json_normalize(df_annuncio["siti"].explode())
-        df_pubblicità["source_id"] = source_key
-        dfs_annunci_pubblicità_list.append(df_pubblicità)
+        if df_annuncio["siti"].notna().any():
+            df_pubblicità = json_normalize(df_annuncio["siti"].explode())
+            df_pubblicità["source_id"] = source_key
+            dfs_annunci_pubblicità_list.append(df_pubblicità)
     
     if "soggetti" in df_annuncio.columns:
-        df_soggetti = json_normalize(df_annuncio["soggetti"].explode())
-        df_soggetti["source_id"] = source_key
-        dfs_annunci_soggetti_list.append(df_soggetti)
+        if df_annuncio["soggetti"].notna().any():
+            df_soggetti = json_normalize(df_annuncio["soggetti"].explode())
+            df_soggetti["source_id"] = source_key
+            dfs_annunci_soggetti_list.append(df_soggetti)
     
     if "beni" in df_annuncio.columns:
-        df_beni = json_normalize(df_annuncio["beni"].explode())
-        df_beni["source_id"] = source_key
-        dfs_annunci_beni_list.append(df_beni)
+        if df_annuncio["beni"].notna().any():
+            df_beni = json_normalize(df_annuncio["beni"].explode())
+            df_beni["source_id"] = source_key
+            dfs_annunci_beni_list.append(df_beni)
 
-        if "allegati" in df_beni.columns:
-            df_allegati_bene = json_normalize(df_beni["allegati"].explode())
-            df_allegati_bene["id_bene"] = df_beni["idBene"].item()
-            dfs_annunci_allegati_bene_list.append(df_allegati_bene)
-        
-        if "datiCatastali" in df_beni.columns:
-            df_dati_catastali = json_normalize(df_beni["datiCatastali"].explode())
-            df_dati_catastali["id_bene"] = df_beni["idBene"].item()
-            dfs_annunci_dati_catastali_list.append(df_dati_catastali)
+            #Gli allegati degli allegati (immagini) sono disponibili al path https://pvp-documenti.apps.pvc-os-caas01-rs.polostrategiconazionale.it/ + allegati.linkAllegato
+            if "allegati" in df_beni.columns:
+                if df_beni["allegati"].notna().any():
+                    df_exploded_allegati = df_beni.explode("allegati")
+                    df_allegati_bene = pd.json_normalize(df_exploded_allegati["allegati"].to_list())
+                    df_allegati_bene["idBene"] = df_exploded_allegati["idBene"].values
+                    dfs_annunci_allegati_bene_list.append(df_allegati_bene)
 
-    return df_annuncio["lotto.idLotto"].item()
-
-def cycle_esperimento(df_esperimento : pd.DataFrame) -> None:
-
-        for esperimento in df_esperimento:
-
-            source_key = df_esperimento["idVendita"].item()
-
-            if "allegati" in df_esperimento.columns:
-                df_allegati = json_normalize(df_esperimento["allegati"].explode())
-                df_allegati["source_id"] = source_key
-                dfs_esperimenti_allegati_list.append(df_allegati)
+                    #Exploded n:m
+                    # df_allegati_bene = pd.json_normalize(df_beni.explode("allegati").to_dict(orient="records"))
             
-            if "altriSiti" in df_esperimento.columns:
-                df_altri_siti = json_normalize(df_esperimento["altriSiti"].explode())
-                df_altri_siti["source_id"] = source_key
-                dfs_esperimenti_altri_siti_list.append(df_altri_siti)
-            
-            if "siti" in df_esperimento.columns:
-                df_pubblicità = json_normalize(df_esperimento["siti"].explode())
-                df_pubblicità["source_id"] = source_key
-                dfs_esperimenti_pubblicità_list.append(df_pubblicità)
-            
-            if "soggetti" in df_esperimento.columns:
-                df_soggetti = json_normalize(df_esperimento["soggetti"].explode())
-                df_soggetti["source_id"] = source_key
-                dfs_esperimenti_soggetti_list.append(df_soggetti)
-            
-            if "beni" in df_esperimento.columns:
-                df_beni = json_normalize(df_esperimento["beni"].explode())
-                df_beni["source_id"] = source_key
-                dfs_esperimenti_beni_list.append(df_beni)
-                
-                if "allegati" in df_beni.columns:
-                    df_allegati_bene = json_normalize(df_beni["allegati"].explode())
-                    df_allegati_bene["id_bene"] = df_beni["idBene"].item()
-                    dfs_esperimenti_allegati_bene_list.append(df_allegati_bene)
-                
-                if "datiCatastali" in df_beni.columns:
-                    df_dati_catastali = json_normalize(df_beni["datiCatastali"].explode())
-                    df_dati_catastali["id_bene"] = df_beni["idBene"].item()
-                    dfs_esperimenti_dati_catastali_list.append(df_dati_catastali)
-
-def parse_info_from_esperimento(esperimento_response : requests.Request) -> None:        #2122200
-    
-    '''
-    Parse request response and normalize json to extract all infos about esperimento (annuncio couln't have esperimento phase yet)
-    '''
-    
-    response_body = esperimento_response.json()["body"]
-    
-    #Check annuncio w/o esperimenti
-    if response_body == []:
-        return
-    
-    df_esperimento = json_normalize(response_body)
-    dfs_esperimenti_esperimento_list.append(df_esperimento)
-
+            if "datiCatastali" in df_beni.columns:  #2131863
+                if df_beni["datiCatastali"].notna().any():
+                    df_exploded_dati_catastali = df_beni.explode("datiCatastali")
+                    # df_dati_catastali = pd.json_normalize(df_exploded_allegati["datiCatastali"].to_list())
+                    df_dati_catastali = json_normalize(df_beni["datiCatastali"].explode())  #Ok?
+                    df_dati_catastali["idBene"] = df_exploded_dati_catastali["idBene"].values
+                    
+                    dfs_annunci_dati_catastali_list.append(df_dati_catastali)
+                    
+                    #Exploded n:m
+                    # df_dati_catastali = pd.json_normalize(df_beni.explode("datiCatastali").to_dict(orient="records"))
     
 def cycle_annnci(df_annunci : pd.DataFrame):
 
@@ -143,17 +102,6 @@ def cycle_annnci(df_annunci : pd.DataFrame):
     global dfs_annunci_allegati_bene_list
     global dfs_annunci_dati_catastali_list
 
-    #Esperimenti lists
-    global dfs_esperimenti_esperimento_list
-    global dfs_esperimenti_altri_siti_list
-    global dfs_esperimenti_allegati_list
-    global dfs_esperimenti_eventi_significativi_list
-    global dfs_esperimenti_pubblicità_list
-    global dfs_esperimenti_soggetti_list
-    global dfs_esperimenti_beni_list
-    global dfs_esperimenti_allegati_bene_list
-    global dfs_esperimenti_dati_catastali_list
-
     #Annunci lists
     dfs_annunci_annuncio_list = []
     dfs_annunci_allegati_list = []
@@ -164,25 +112,11 @@ def cycle_annnci(df_annunci : pd.DataFrame):
     dfs_annunci_allegati_bene_list = []
     dfs_annunci_dati_catastali_list = []
 
-    #esperimenti lists
-    dfs_esperimenti_esperimento_list = []
-    dfs_esperimenti_altri_siti_list = []
-    dfs_esperimenti_allegati_list = []
-    dfs_esperimenti_eventi_significativi_list = []
-    dfs_esperimenti_pubblicità_list = []
-    dfs_esperimenti_soggetti_list = []
-    dfs_esperimenti_beni_list = []
-    dfs_esperimenti_allegati_bene_list = []
-    dfs_esperimenti_dati_catastali_list = []
-    
     #Cycle all annuncio in annunci extraction
     for id_annuncio in df_annunci["id"]:
 
         annuncio_response = request_specific_annuncio_from_pvp(id_annuncio)
-        id_lotto_annuncio = parse_info_from_annuncio(annuncio_response)
-
-        esperimento_response = request_esperimento_for_annuncio(id_lotto_annuncio)
-        parse_info_from_esperimento(esperimento_response)
+        parse_info_from_annuncio(annuncio_response)
 
 def run_cycle_annuncio_in_annunci(df_annunci : pd.DataFrame) -> list:
 
@@ -197,9 +131,8 @@ def run_cycle_annuncio_in_annunci(df_annunci : pd.DataFrame) -> list:
     cycle_annnci(df_annunci)
 
     dfs_annunci_list =  [dfs_annunci_annuncio_list, dfs_annunci_allegati_list, dfs_annunci_eventi_significativi_list, dfs_annunci_pubblicità_list, dfs_annunci_soggetti_list, dfs_annunci_beni_list, dfs_annunci_allegati_bene_list, dfs_annunci_dati_catastali_list]
-    dfs_esperimenti_list=  [dfs_esperimenti_esperimento_list, dfs_esperimenti_altri_siti_list, dfs_esperimenti_allegati_list, dfs_esperimenti_eventi_significativi_list, dfs_esperimenti_pubblicità_list, dfs_esperimenti_soggetti_list, dfs_esperimenti_beni_list, dfs_esperimenti_allegati_bene_list, dfs_esperimenti_dati_catastali_list]
 
-    return dfs_annunci_list, dfs_esperimenti_list
+    return dfs_annunci_list
 
 if __name__ == "__main__":
     run_cycle_annuncio_in_annunci()

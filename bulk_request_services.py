@@ -13,7 +13,7 @@ def request_annunci_from_pvp(size : int) -> requests.Request:
     url = "https://pvp.giustizia.it/ric-496b258c-986a1b71/ric-ms/ricerca/vendite"
     payload = {
         "language": "it",
-        "codTipoLotto" : "IMMOBILI",
+        "tipoLotto" : "IMMOBILI",
         # "size": "100",
         # "page": 0,
         # "sort" : "dataOraVendita,asc",
@@ -22,6 +22,7 @@ def request_annunci_from_pvp(size : int) -> requests.Request:
     params = {
         "size": size,
         "page": 0,
+        # "codTipoLotto" : "IMMOBILI",
         # "sort": "dataOraVendita,asc"  # o "citta,asc"
     }
 
