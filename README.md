@@ -1,6 +1,6 @@
 # Portale-vendite-pubbliche-PVP [![LinkedIn](https://img.shields.io/badge/LinkedIn-Profile-blue)](https://www.linkedin.com/in/gian-maria-lunghi-24376b163/)
 
-Il progetto PVP ha l'obiettivo di far conoscere al pubblico il portale gestito dal Ministero della Giustizia relativo alle aste pubbliche e un modo per scaricare in locale le informazioni su questo pubblicate.
+Il PVP (Portale Vendite Pubbliche) mira a facilitare l'accesso e la diffusione delle informazioni riguardanti le aste pubbliche gestite dal Ministero della Giustizia. Il portale ufficiale delle vendite pubbliche è uno strumento fondamentale per garantire trasparenza e accessibilità nelle procedure di vendita di diversi tipi di asset. Lo scopo di questo progetto è rendere più accessibili e comprensibili le informazioni fornite dal portale.
 
 ## Indice
 
