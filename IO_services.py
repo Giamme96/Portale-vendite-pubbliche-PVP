@@ -13,11 +13,11 @@ def compute_final_dfs(dfs_list : list) -> list:
 
 def export_cumulative_excel(dfs_list : list) -> None:
     '''
-    Export all the dfs in a Excel file, under Output folder
+    Export all the dfs in a Excel file
     '''
     sheet_name_list_annunci = ["Annunci", "Annuncio", "Allegati", "Eventi_significativi", "Pubblicità", "Soggetti", "Beni", "Allegati_bene", "Dati_catastali"]
 
-    with pd.ExcelWriter("Output\Estrazione_pvp.xlsx") as writer:
+    with pd.ExcelWriter("Estrazione_pvp.xlsx") as writer:
         
         for df, sheet in zip(dfs_list, sheet_name_list_annunci):
             df.to_excel(writer, sheet_name=sheet, index=False)

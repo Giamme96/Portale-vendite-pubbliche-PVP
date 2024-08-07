@@ -3,7 +3,7 @@ from bulk_request_services import run_bulk_request
 from specific_annuncio_request_services import run_cycle_annuncio_in_annunci
 
 #Set key params
-request_annunci_size : int = 400
+request_annunci_size : int = 100
 
 df_annunci = run_bulk_request(request_annunci_size)
 
