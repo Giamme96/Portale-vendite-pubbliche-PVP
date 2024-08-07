@@ -1,21 +1,41 @@
-# Portale-vendite-pubbliche-PVP
+# Portale-vendite-pubbliche-PVP [![LinkedIn](https://img.shields.io/badge/LinkedIn-Profile-blue)](https://www.linkedin.com/in/gian-maria-lunghi-24376b163/)
 
 Il progetto PVP ha l'obiettivo di far conoscere al pubblico il portale gestito dal Ministero della Giustizia relativo alle aste pubbliche e un modo per scaricare in locale le informazioni su questo pubblicate.
+
+## Indice
+
+- [Introduzione](#introduzione)
+- [Uso](#uso)
+- [Installazione](#installazione)
+- [Licenza](#licenza)
+- [Disclaimer](#disclaimer)
 
 ## Introduzione
 
 Nel 2024, il portale è stato ammodernato con significative integrazioni al back-end. Precedentemente, le informazioni "scaricabili" del portale erano interamente basate su HTML statico, ma con il nuovo aggiornamento, è in grado di restituire risposte in formato JSON quando interrogato. Questo cambiamento facilita l'accesso e l'integrazione delle informazioni sulle aste pubbliche in applicazioni e sistemi esterni.
 
 ![Panoramica_annunci](https://github.com/user-attachments/assets/f70f7a4b-9186-437f-8066-3d0a11145bb0)
+
+## Uso
 Tramite il codice proposto è possibile scaricare tutto il database del PVP. Il portale è così composto:
 - Home page con possibilità di scegliere diversi tipi di asset (nel codice verrà preso in considerazione solo il Real Estate)
 - Ogni annuncio è identificato come lotto, quindi può avere al suo interno più assets
 - Il portale restituisce anche le righe di storico (esperimenti di vendita) questi non sono stati appositamente integrati nel codice per due motivi principali:
     - Non tutti gli esperimenti di vendita su un bene registrano tutti gli altri esperimenti di vendita, oltretutto gli stessi beni cambiano di ID
     - Tutti gli esperimenti di vendita sono comunque censiti come annunci (se si scarica tutto il db, avrai lo storico completo)
-- La *size* della pagina degli annunci non sembra essere limitata, (eg. ho testato 1k annunci e restituiva il risultato correttamente). A vostra discrezione l'ammontare che inserite.
+- La *size* della pagina degli annunci non sembra essere limitata, (eg. ho testato 1k annunci e restituiva il risultato correttamente). A vostra discrezione l'ammontare che inserite
+- Le *bulk_iterations* sono limitate a 5 x *size*. Basta decommentare le righe di codice precedenti per avere il full db
 
-### Alcune info interessanti
+```bash
+#Max elements
+# max_elements_in_pvp = annunci_request_response.json()["body"]["totalElements"]
+# bulk_iterations = int(np.ceil(max_elements_in_pvp / size))
+
+#Bypass max elements
+bulk_iterations = 5
+```
+
+### Alcune info interessanti estraibili dal PVP
 - ID procedure
 - Prezzi
 - Status annuncio
@@ -23,15 +43,8 @@ Tramite il codice proposto è possibile scaricare tutto il database del PVP. Il 
 - Dati catastali
 - Superficie/vani e piano
 - Allegati/documenti
-- 
-- 
 
-## Indice
 
-- [Introduzione](#introduzione)
-- [Installazione](#installazione)
-- [Licenza](#licenza)
-- [Disclaimer](#disclaimer)
 
 ## Installazione
 
